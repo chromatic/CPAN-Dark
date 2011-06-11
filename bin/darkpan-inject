@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use CPAN::Dark;
+CPAN::Dark->new->inject_files( @ARGV );
