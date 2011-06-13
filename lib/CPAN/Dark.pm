@@ -11,7 +11,7 @@ use Path::Class        0.24;
 use List::Util         1.20, 'first';
 use Archive::Tar       1.76;
 use Compress::Zlib     2.035;
-use CPAN::Mini::Inject 0.29;
+use CPAN::Mini::Inject 0.30; # removes old entries of injected modules
 
 sub new
 {
