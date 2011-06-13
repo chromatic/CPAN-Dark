@@ -45,7 +45,10 @@ END_PACKAGE_HEADER
 sub should_create_repository
 {
     my $self = shift;
-    my $reinit = @_ ? shift : $self->{reinitialize};
+    my %args = @_;
+    my $reinit = exists $args{reinitialize}
+        ? $args{reinitialize}
+        : $self->{reinitialize};
 
     my $cpmi = $self->{cpmi};
     my $repo = $cpmi->config->get( 'local' );
@@ -81,7 +84,7 @@ sub inject_files
     # if this is a new version of module already in the darkpan the old version
     # will be listed first in the 02packages file, so reinitialize that file
     # to make sure tools like cpanm only see the latest version
-    $self->create_darkpan(1);
+    $self->create_darkpan(reinitialize => 1);
 
     my $cpmi = $self->{cpmi};
 
