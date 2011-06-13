@@ -1,0 +1,10 @@
+README for CPAN::Dark
+
+CPAN::Dark allows you to manage your own sparse DarkPAN: a CPAN-alike which
+contains only those distributions you inject.
+
+While CPAN::Dark uses CPAN::Mini and CPAN::Mini::Inject, it does not require
+you to maintain your own full mirror of the public CPAN. As a result, you
+should configure your module installation and metadata tools (such as
+App::cpanminus and App::cpanoutdated) to use your local DarkPAN first, then
+fall back to the public CPAN.
