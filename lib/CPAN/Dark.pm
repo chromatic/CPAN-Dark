@@ -107,3 +107,86 @@ sub load_metayaml
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+CPAN::Dark - manage a DarkPAN installation
+
+=head1 SYNOPSIS
+
+    use CPAN::Dark;
+    CPAN::Dark->new->inject_files( @list_of_dist_tarballs );
+
+=head1 DESCRIPTION
+
+A DarkPAN is like the public CPAN except that it's not public. Otherwise it
+resembles the public CPAN sufficiently that CPAN installation tools such as
+CPAN.pm, CPANPLUS, and cpanminus can install distributions from it.
+
+While existing CPAN tools such as L<CPAN::Mini> allow you to I<mirror> the
+public CPAN and L<CPAN::Mini::Inject> allows you to install your own private
+distributions into such a mirror, C<CPAN::Dark> takes the opposite approach. A
+DarkPAN I<only> contains the distributions you have explicitly installed into
+it.
+
+C<CPAN::Dark> relies on the existence of an appropriate
+L<CPAN::Mini::Inject::Config>-style configuration file:
+
+=over 4
+
+=item * pointed to by the C<MCPANI_CONFIG> environment variable
+
+=item * present at F<$HOME/.mcpani/config>
+
+=item * present at F</usr/local/etc/mcpani>
+
+=item * present at F</etc/mcpani>
+
+=back
+
+The contents of this file must conform to the described file format, with one
+additional parameter. Provide the C<author> configuration to set a default
+author for all injected DarkPAN distributions.
+
+=head1 METHODS
+
+This module provides three public methods:
+
+=head2 C<new()>
+
+This constructor creates and returns a new C<CPAN::Dark> object. There is no
+user-servicable configuration. This will throw an exception if the
+configuration file is missing or invalid.
+
+=head2 C<inject_files( @tarballs )>
+
+Given a list of paths to CPAN-compatible tarballs, this method will inject them
+into the configured DarkPAN installation. If the DarkPAN has not yet been
+created and initialized, this method will attempt to create it. This method
+will also throw an exception if any of the given files do not exist or are not
+readable.
+
+=head2 C<create_darkpan()>
+
+This method will create the DarkPAN represented by the current configuration,
+if necessary. It will throw an exception if this is not possible. Check your
+file permissions if this happens.
+
+=head1 SEE ALSO
+
+L<CPAN::Mini>
+
+L<CPAN::Mini::Inject>
+
+=head1 AUTHOR
+
+chromatic C<< chromatic at wgz dot org >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2011, chromatic. Redistribution and modification permitted under
+the terms of the Artistic License 2.0.
