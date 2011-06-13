@@ -23,7 +23,7 @@ sub create_darkpan
     my $self = shift;
     my $cpmi = $self->{cpmi};
 
-    return unless my $repo = $self->should_create_repository;
+    return unless my $repo = $self->should_create_repository(@_);
 
     File::Path::mkpath( [ dir( $repo, 'authors' ), dir( $repo, 'modules' ) ] );
 
@@ -45,10 +45,14 @@ END_PACKAGE_HEADER
 sub should_create_repository
 {
     my $self = shift;
+    my $reinit = @_ ? shift : $self->{reinitialize};
+
     my $cpmi = $self->{cpmi};
     my $repo = $cpmi->config->get( 'local' );
 
     Carp::croak( "No DarkPAN configured!" ) unless $repo;
+
+    return $repo if $reinit;
 
     return $repo unless -d $repo;
     return $repo unless -f file( $repo, 'authors', '01mailrc.txt.gz' );
@@ -73,7 +77,11 @@ sub write_gz
 sub inject_files
 {
     my $self = shift;
-    $self->create_darkpan;
+
+    # if this is a new version of module already in the darkpan the old version
+    # will be listed first in the 02packages file, so reinitialize that file
+    # to make sure tools like cpanm only see the latest version
+    $self->create_darkpan(1);
 
     my $cpmi = $self->{cpmi};
 
