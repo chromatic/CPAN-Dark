@@ -73,26 +73,33 @@ sub write_gz
 sub inject_files
 {
     my $self = shift;
+    $self->inject_file_as($self->{cpmi}->config->{author},$_) for (@_);
+}
+
+sub inject_files_as
+{
+    my $self = shift;
+	my $author = shift;
+    $self->inject_file_as($author,$_) for (@_);
+}
+
+sub inject_file_as
+{
+    my ($self, $author, $file) = @_;
     $self->create_darkpan;
+    Carp::croak( "Cannot find '$file'" ) unless $file and -e $file;
 
-    my $cpmi = $self->{cpmi};
+    my $meta    = $self->load_metayaml( $file );
+    (my $module = $meta->{name}) =~ s/-/::/g;
 
-    for my $file (@_)
-    {
-        Carp::croak( "Cannot find '$file'" ) unless $file and -e $file;
+    $self->{cpmi}->add(
+        file     => $file,
+        module   => $module,
+        version  => $meta->{version},
+        authorid => $author,
+    );
 
-        my $meta    = $self->load_metayaml( $file );
-        (my $module = $meta->{name}) =~ s/-/::/g;
-
-        $cpmi->add(
-            file     => $file,
-            module   => $module,
-            version  => $meta->{version},
-            authorid => $cpmi->config->{author},
-        );
-    }
-
-    $cpmi->writelist->inject;
+    $self->{cpmi}->writelist->inject;
 }
 
 sub load_metayaml
@@ -120,6 +127,7 @@ CPAN::Dark - manage a DarkPAN installation
 
     use CPAN::Dark;
     CPAN::Dark->new->inject_files( @list_of_dist_tarballs );
+    CPAN::Dark->new->inject_files_as( $author, @list_of_dist_tarballs );
 
 =head1 DESCRIPTION
 
@@ -152,6 +160,13 @@ The contents of this file must conform to the described file format, with one
 additional parameter. Provide the C<author> configuration to set a default
 author for all injected DarkPAN distributions.
 
+Example:
+
+  local: /home/larry/darkpan
+  remote: http://localhost/
+  author: LWALL
+  repository: /home/larry/tmp
+
 =head1 METHODS
 
 This module provides three public methods:
@@ -170,6 +185,11 @@ created and initialized, this method will attempt to create it. This method
 will also throw an exception if any of the given files do not exist or are not
 readable.
 
+=head2 C<inject_files_as( $author, @tarballs )>
+
+The same function as I<inject_files>, but you can use a different author, then
+given via L<CPAN::Mini::Inject> configuration.
+
 =head2 C<create_darkpan()>
 
 This method will create the DarkPAN represented by the current configuration,
@@ -177,6 +197,8 @@ if necessary. It will throw an exception if this is not possible. Check your
 file permissions if this happens.
 
 =head1 SEE ALSO
+
+L<darkpan-inject>
 
 L<CPAN::Mini>
 
