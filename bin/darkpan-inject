@@ -1,7 +1,50 @@
 #!/usr/bin/perl
+# ABSTRACT: Generate and inject files into your darkpan
 
 use strict;
 use warnings;
 
 use CPAN::Dark;
-CPAN::Dark->new->inject_files( @ARGV );
+use Getopt::Long 2.38;
+
+my $author;
+GetOptions("as=s" => \$author);
+
+my $darkpan = CPAN::Dark->new;
+
+$author ? $darkpan->inject_files_as( $author, @ARGV ) : $darkpan->inject_files( @ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+darkpan-inject - Generate and inject files into your darkpan
+
+=head1 SYNOPSIS
+
+    # Inject files as the default author given in the configuration
+    darkpan-inject MyDistribution-0.001.tar.gz MyOtherDistribution-0.010.tar.gz
+	
+    # Inject files as a specific author, only one can be given
+    darkpan-inject --as GETTY MyDistribution-Web-0.020.tar.gz MyOtherDistribution-Web-1.200.tar.gz 
+
+=head1 DESCRIPTION
+
+Please read L<CPAN::Dark> first to understand the concept of a DarkPAN and
+for getting the information how to configure those commands so that you can
+use them to startup your own DarkPAN.
+
+=head1 SEE ALSO
+
+L<CPAN::Dark>
+
+=head1 AUTHOR
+
+chromatic C<< chromatic at wgz dot org >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2011, chromatic. Redistribution and modification permitted under
+the terms of the Artistic License 2.0.
