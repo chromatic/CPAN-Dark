@@ -82,14 +82,15 @@ sub inject_files
         Carp::croak( "Cannot find '$file'" ) unless $file and -e $file;
 
         my $meta    = $self->load_metayaml( $file );
-        (my $module = $meta->{name}) =~ s/-/::/g;
-
-        $cpmi->add(
-            file     => $file,
-            module   => $module,
-            version  => $meta->{version},
-            authorid => $cpmi->config->{author},
-        );
+        for my $module ( keys %{$meta->{provides}} )
+        {
+            $cpmi->add(
+                file     => $file,
+                module   => $module,
+                authorid => $cpmi->config->{author},
+                version  => $meta->{provides}->{$module}->{version},
+            );
+        }
     }
 
     $cpmi->writelist->inject;
